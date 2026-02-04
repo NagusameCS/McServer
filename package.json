@@ -109,7 +109,8 @@
     "copyright": "Copyright (c) 2026 NagusameCS",
     "asar": true,
     "asarUnpack": [
-      "node_modules/bcrypt/**/*"
+      "node_modules/bcrypt/**/*",
+      "node_modules/sharp/**/*"
     ],
     "directories": {
       "output": "release",
@@ -122,24 +123,16 @@
       "assets/**/*",
       "node_modules/**/*",
       "package.json",
-      "!node_modules/*/{CHANGELOG.md,README.md,readme.md,test,__tests__,tests,*.ts}",
-      "!node_modules/.cache/**/*"
-    ],
-    "extraResources": [
-      {
-        "from": "dist",
-        "to": "app/dist",
-        "filter": [
-          "**/*"
-        ]
-      },
-      {
-        "from": "dashboard/dist",
-        "to": "app/dashboard/dist",
-        "filter": [
-          "**/*"
-        ]
-      }
+      "!node_modules/*/{CHANGELOG.md,README.md,readme.md,test,__tests__,tests,*.ts,*.map}",
+      "!node_modules/.cache/**/*",
+      "!node_modules/electron/**/*",
+      "!node_modules/electron-builder/**/*",
+      "!node_modules/@electron/**/*",
+      "!node_modules/typescript/**/*",
+      "!node_modules/vitest/**/*",
+      "!node_modules/@vitest/**/*",
+      "!node_modules/eslint/**/*",
+      "!node_modules/@typescript-eslint/**/*"
     ],
     "mac": {
       "category": "public.app-category.games",
