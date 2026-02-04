@@ -3,7 +3,7 @@ import { matchesVersionRange } from '../../src/mods/checker';
 import { ModCompatibilityChecker } from '../../src/mods/checker';
 import type { ModInfo } from '../../src/types';
 
-// Test version matching function directly (the core logic we can unit test)
+// Test version matching function directly
 describe('Version Matching', () => {
   describe('matchesVersionRange', () => {
     it('should match exact versions', () => {
@@ -42,6 +42,23 @@ describe('Version Matching', () => {
   });
 });
 
+// Helper to create a valid ModInfo object
+function createMod(overrides: Partial<ModInfo>): ModInfo {
+  return {
+    id: 'test-mod',
+    name: 'Test Mod',
+    version: '1.0.0',
+    loader: 'fabric',
+    minecraftVersions: ['1.20.4'],
+    dependencies: [],
+    filePath: '/mods/test.jar',
+    fileName: 'test.jar',
+    hash: 'abc123',
+    enabled: true,
+    ...overrides
+  };
+}
+
 describe('ModCompatibilityChecker', () => {
   let checker: ModCompatibilityChecker;
 
@@ -52,17 +69,7 @@ describe('ModCompatibilityChecker', () => {
   describe('checkCompatibility', () => {
     it('should detect loader mismatch', () => {
       const mods: ModInfo[] = [
-        {
-          id: 'forge-mod',
-          name: 'Forge Mod',
-          version: '1.0.0',
-          loader: 'forge',
-          minecraftVersions: ['1.20.4'],
-          dependencies: [],
-          filePath: '/mods/forge-mod.jar',
-          fileName: 'forge-mod.jar',
-          enabled: true
-        }
+        createMod({ id: 'forge-mod', name: 'Forge Mod', loader: 'forge' })
       ];
 
       const result = checker.checkCompatibility(mods, 'fabric', '1.20.4');
@@ -73,28 +80,8 @@ describe('ModCompatibilityChecker', () => {
 
     it('should detect duplicate mods', () => {
       const mods: ModInfo[] = [
-        {
-          id: 'test-mod',
-          name: 'Test Mod v1',
-          version: '1.0.0',
-          loader: 'fabric',
-          minecraftVersions: ['1.20.4'],
-          dependencies: [],
-          filePath: '/mods/test-mod-1.jar',
-          fileName: 'test-mod-1.jar',
-          enabled: true
-        },
-        {
-          id: 'test-mod',
-          name: 'Test Mod v2',
-          version: '2.0.0',
-          loader: 'fabric',
-          minecraftVersions: ['1.20.4'],
-          dependencies: [],
-          filePath: '/mods/test-mod-2.jar',
-          fileName: 'test-mod-2.jar',
-          enabled: true
-        }
+        createMod({ id: 'dupe-mod', name: 'Mod v1', version: '1.0.0', filePath: '/mods/v1.jar' }),
+        createMod({ id: 'dupe-mod', name: 'Mod v2', version: '2.0.0', filePath: '/mods/v2.jar' })
       ];
 
       const result = checker.checkCompatibility(mods, 'fabric', '1.20.4');
@@ -105,19 +92,13 @@ describe('ModCompatibilityChecker', () => {
 
     it('should detect missing dependencies', () => {
       const mods: ModInfo[] = [
-        {
+        createMod({
           id: 'dependent-mod',
           name: 'Dependent Mod',
-          version: '1.0.0',
-          loader: 'fabric',
-          minecraftVersions: ['1.20.4'],
           dependencies: [
-            { modId: 'required-lib', versionRange: '>=1.0.0', type: 'required' }
-          ],
-          filePath: '/mods/dependent.jar',
-          fileName: 'dependent.jar',
-          enabled: true
-        }
+            { modId: 'missing-lib', versionRange: '>=1.0.0', required: true, type: 'required' }
+          ]
+        })
       ];
 
       const result = checker.checkCompatibility(mods, 'fabric', '1.20.4');
@@ -128,30 +109,14 @@ describe('ModCompatibilityChecker', () => {
 
     it('should pass when all dependencies are met', () => {
       const mods: ModInfo[] = [
-        {
-          id: 'lib-mod',
-          name: 'Library Mod',
-          version: '1.5.0',
-          loader: 'fabric',
-          minecraftVersions: ['1.20.4'],
-          dependencies: [],
-          filePath: '/mods/lib.jar',
-          fileName: 'lib.jar',
-          enabled: true
-        },
-        {
-          id: 'dependent-mod',
-          name: 'Dependent Mod',
-          version: '1.0.0',
-          loader: 'fabric',
-          minecraftVersions: ['1.20.4'],
+        createMod({ id: 'lib-mod', name: 'Library', version: '1.5.0' }),
+        createMod({
+          id: 'app-mod',
+          name: 'App',
           dependencies: [
-            { modId: 'lib-mod', versionRange: '>=1.0.0', type: 'required' }
-          ],
-          filePath: '/mods/dependent.jar',
-          fileName: 'dependent.jar',
-          enabled: true
-        }
+            { modId: 'lib-mod', versionRange: '>=1.0.0', required: true, type: 'required' }
+          ]
+        })
       ];
 
       const result = checker.checkCompatibility(mods, 'fabric', '1.20.4');

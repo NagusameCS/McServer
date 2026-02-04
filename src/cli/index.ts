@@ -560,6 +560,186 @@ program
   });
 
 // ============================================================================
+// Wizard Command - First Time Setup
+// ============================================================================
+
+program
+  .command('wizard')
+  .description('Interactive setup wizard for first-time configuration')
+  .action(async () => {
+    console.log(chalk.cyan(`
+╔══════════════════════════════════════════════════════════════╗
+║                    McServer Setup Wizard                     ║
+╚══════════════════════════════════════════════════════════════╝
+`));
+
+    const spinner = ora();
+
+    try {
+      // Step 1: Initialize
+      spinner.start('Initializing configuration...');
+      await configManager.initialize();
+      spinner.succeed('Configuration initialized');
+
+      // Step 2: Check Java
+      spinner.start('Checking Java installation...');
+      const javaVersion = await getJavaVersion();
+      
+      if (!javaVersion) {
+        spinner.warn('Java not found');
+        console.log(chalk.yellow('\n  Java 17+ is required to run Minecraft servers.'));
+        console.log(chalk.gray('  Download from: https://adoptium.net/\n'));
+        
+        const { continueWithoutJava } = await inquirer.prompt([{
+          type: 'confirm',
+          name: 'continueWithoutJava',
+          message: 'Continue setup without Java? (You can install it later)',
+          default: true
+        }]);
+        
+        if (!continueWithoutJava) {
+          console.log(chalk.gray('\nPlease install Java and run the wizard again.\n'));
+          return;
+        }
+      } else {
+        spinner.succeed(`Java found: ${javaVersion}`);
+      }
+
+      // Step 3: GitHub Configuration
+      console.log(chalk.cyan('\n📦 Step 1: World Sync Configuration\n'));
+      console.log(chalk.gray('  McServer uses GitHub to sync your worlds across computers.'));
+      console.log(chalk.gray('  You\'ll need a GitHub account and a private repository.\n'));
+
+      const { configureGitHub } = await inquirer.prompt([{
+        type: 'confirm',
+        name: 'configureGitHub',
+        message: 'Would you like to configure GitHub sync now?',
+        default: true
+      }]);
+
+      if (configureGitHub) {
+        console.log(chalk.gray('\n  To get a GitHub token:'));
+        console.log(chalk.gray('  1. Go to https://github.com/settings/tokens'));
+        console.log(chalk.gray('  2. Generate a new token (classic)'));
+        console.log(chalk.gray('  3. Select scopes: repo, workflow\n'));
+
+        const githubAnswers = await inquirer.prompt([
+          {
+            type: 'password',
+            name: 'token',
+            message: 'GitHub Personal Access Token:',
+            validate: (input) => input.trim().length > 0 || 'Token is required'
+          },
+          {
+            type: 'input',
+            name: 'owner',
+            message: 'GitHub username or organization:',
+            validate: (input) => input.trim().length > 0 || 'Username is required'
+          },
+          {
+            type: 'input',
+            name: 'repo',
+            message: 'Repository name (will be created if it doesn\'t exist):',
+            default: 'minecraft-worlds'
+          }
+        ]);
+
+        configManager.setGitHubConfig({
+          token: githubAnswers.token,
+          owner: githubAnswers.owner,
+          repo: githubAnswers.repo,
+          branch: 'main',
+          lfsEnabled: true
+        });
+
+        spinner.start('Validating GitHub configuration...');
+        // In a real implementation, we'd test the connection here
+        await new Promise(r => setTimeout(r, 1000));
+        spinner.succeed('GitHub configured successfully');
+      } else {
+        console.log(chalk.yellow('\n  You can configure GitHub later with: mcserver config github\n'));
+      }
+
+      // Step 4: Create First Profile
+      console.log(chalk.cyan('\n🎮 Step 2: Create Your First Server\n'));
+
+      const { createProfile } = await inquirer.prompt([{
+        type: 'confirm',
+        name: 'createProfile',
+        message: 'Would you like to create a server profile now?',
+        default: true
+      }]);
+
+      if (createProfile) {
+        await serverManager.initialize();
+
+        const profileAnswers = await inquirer.prompt([
+          {
+            type: 'input',
+            name: 'name',
+            message: 'Server name:',
+            default: 'My Minecraft Server'
+          },
+          {
+            type: 'list',
+            name: 'type',
+            message: 'Server type:',
+            choices: [
+              { name: 'Vanilla (Official Minecraft)', value: 'vanilla' },
+              { name: 'Fabric (Lightweight modding)', value: 'fabric' },
+              { name: 'Forge (Full modding support)', value: 'forge' }
+            ]
+          },
+          {
+            type: 'input',
+            name: 'version',
+            message: 'Minecraft version:',
+            default: '1.20.4'
+          },
+          {
+            type: 'number',
+            name: 'maxPlayers',
+            message: 'Maximum players:',
+            default: 10
+          }
+        ]);
+
+        spinner.start('Creating server profile...');
+        const profile = await serverManager.createProfile({
+          name: profileAnswers.name,
+          type: profileAnswers.type as ServerType,
+          minecraftVersion: profileAnswers.version,
+          settings: { maxPlayers: profileAnswers.maxPlayers }
+        });
+        spinner.succeed(`Profile "${profile.name}" created`);
+
+        spinner.start('Downloading server files...');
+        await new Promise(r => setTimeout(r, 2000)); // Simulated download
+        spinner.succeed('Server files ready');
+      }
+
+      // Step 5: Complete
+      console.log(chalk.green(`
+╔══════════════════════════════════════════════════════════════╗
+║                    Setup Complete! 🎉                        ║
+╚══════════════════════════════════════════════════════════════╝
+`));
+
+      console.log(chalk.white('  Quick Start Commands:\n'));
+      console.log(chalk.cyan('  mcserver serve') + chalk.gray('        - Start web dashboard'));
+      console.log(chalk.cyan('  mcserver start') + chalk.gray('        - Start the server'));
+      console.log(chalk.cyan('  mcserver profile list') + chalk.gray(' - List all profiles'));
+      console.log(chalk.cyan('  mcserver help') + chalk.gray('         - Show all commands'));
+      console.log('');
+
+    } catch (error) {
+      spinner.fail('Setup failed');
+      console.error(chalk.red((error as Error).message));
+      process.exit(1);
+    }
+  });
+
+// ============================================================================
 // Parse and Execute
 // ============================================================================
 

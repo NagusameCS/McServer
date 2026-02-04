@@ -15,48 +15,82 @@ McServer allows a group of friends to host and share a single persistent Minecra
 - 🖥️ **Web dashboard**: Real-time server status, player list, and controls
 - ⌨️ **CLI interface**: Full command-line control
 
-## 🚀 Quick Start (5 minutes)
+## 🚀 Easy Start (Click and Run!)
 
-### Prerequisites
+### Option 1: One-Click Launcher (Recommended for Beginners)
 
-- **Java 17 or newer** - [Download from Adoptium](https://adoptium.net/)
-- **Git** - [Download from git-scm.com](https://git-scm.com/)
-- **GitHub account** - For world synchronization
+Just double-click and the launcher will:
+- ✅ Check for required software (Node.js, Git, Java)
+- ✅ Offer to install anything missing
+- ✅ Guide you through setup with a friendly wizard
 
-### Installation
+**Windows:** Double-click `start.bat`
+
+**macOS/Linux:** 
+```bash
+chmod +x start.sh
+./start.sh
+```
+
+### Option 2: Download Pre-built Binary
 
 1. Download the latest release for your platform:
    - `mcserver-win.exe` for Windows
    - `mcserver-macos` for macOS
    - `mcserver-linux` for Linux
 
-2. Open a terminal and initialize McServer:
-
+2. Run the setup wizard:
 ```bash
-mcserver init
+mcserver wizard
 ```
 
-3. Configure GitHub for world sync:
+### Option 3: Manual Installation
 
+#### Prerequisites
+
+- **Java 17 or newer** - [Download from Adoptium](https://adoptium.net/)
+- **Git** - [Download from git-scm.com](https://git-scm.com/)
+- **Node.js 18+** - [Download from nodejs.org](https://nodejs.org/)
+- **GitHub account** - For world synchronization
+
+#### Steps
+
+1. Clone and install:
 ```bash
-mcserver config github
+git clone https://github.com/NagusameCS/McServer.git
+cd McServer
+npm install
+cd dashboard && npm install && cd ..
+npm run build
 ```
 
-You'll need:
-- Your GitHub username
-- A repository name (will be created if it doesn't exist)
-- A personal access token with `repo` permissions
-
-4. Create a server profile:
-
+2. Run the wizard:
 ```bash
-mcserver profile create
+node dist/cli/index.js wizard
 ```
 
-5. Start the server:
+## 📖 Usage
 
+### Start the Web Dashboard
+```bash
+mcserver serve
+```
+Opens at http://localhost:3847
+
+### Start the Server
 ```bash
 mcserver start
+```
+
+### CLI Commands
+```bash
+mcserver help              # Show all commands
+mcserver profile create    # Create a server profile
+mcserver profile list      # List all profiles
+mcserver mod add <url>     # Add a mod
+mcserver backup create     # Create a backup
+mcserver sync push         # Push world to GitHub
+mcserver sync pull         # Pull world from GitHub
 ```
 
 That's it! 🎉 Share the connection address with your friends.
