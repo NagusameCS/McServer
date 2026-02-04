@@ -36,19 +36,8 @@ jobs:
       - name: Build app
         run: npm run build
 
-      - name: Build macOS DMG (Direct Distribution)
-        env:
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-          CSC_LINK: ${{ secrets.CSC_LINK }}
-          CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
-        run: npm run electron:mac
-        if: ${{ secrets.CSC_LINK != '' }}
-
-      - name: Build macOS DMG (Unsigned)
+      - name: Build macOS DMG (Unsigned for open source)
         run: npm run electron:mac -- --publish never
-        if: ${{ secrets.CSC_LINK == '' }}
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: false
 
@@ -59,61 +48,6 @@ jobs:
           path: |
             release/*.dmg
             release/*.zip
-
-  build-macos-mas:
-    runs-on: macos-latest
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: |
-          npm ci
-          cd dashboard && npm ci
-
-      - name: Generate icons
-        run: |
-          brew install imagemagick
-          ./scripts/generate-icons.sh
-
-      - name: Setup provisioning profile
-        env:
-          PROVISIONING_PROFILE: ${{ secrets.MAS_PROVISIONING_PROFILE }}
-        run: |
-          echo "$PROVISIONING_PROFILE" | base64 --decode > build/embedded.provisionprofile
-
-      - name: Build app
-        run: npm run build
-
-      - name: Build Mac App Store package
-        env:
-          CSC_LINK: ${{ secrets.MAS_CSC_LINK }}
-          CSC_KEY_PASSWORD: ${{ secrets.MAS_CSC_KEY_PASSWORD }}
-          CSC_INSTALLER_LINK: ${{ secrets.MAS_INSTALLER_CSC_LINK }}
-          CSC_INSTALLER_KEY_PASSWORD: ${{ secrets.MAS_INSTALLER_CSC_KEY_PASSWORD }}
-        run: npm run electron:mac:mas
-
-      - name: Upload to App Store Connect
-        env:
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
-        run: |
-          xcrun altool --upload-app -f "release/*.pkg" \
-            -t macos -u "$APPLE_ID" -p "$APPLE_APP_SPECIFIC_PASSWORD"
-        continue-on-error: true
-
-      - name: Upload MAS artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: mcserver-mas
-          path: release/*.pkg
 
   build-windows:
     runs-on: windows-latest
@@ -136,9 +70,6 @@ jobs:
         run: npm run build
 
       - name: Build Windows installer
-        env:
-          WIN_CSC_LINK: ${{ secrets.WIN_CSC_LINK }}
-          WIN_CSC_KEY_PASSWORD: ${{ secrets.WIN_CSC_KEY_PASSWORD }}
         run: npm run electron:win
 
       - name: Upload Windows artifacts
