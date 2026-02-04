@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { CheckCircle, Circle, ChevronRight, ChevronLeft, Loader2, ExternalLink } from 'lucide-react';
+import { CheckCircle, Circle, ChevronRight, ChevronLeft, Loader2, ExternalLink, Gamepad2, RefreshCw, Globe, Package, Save, PartyPopper, Hammer, Scissors } from 'lucide-react';
 
 interface WizardProps {
   onComplete: () => void;
@@ -199,7 +199,9 @@ export default function SetupWizard({ onComplete }: WizardProps) {
           {/* Welcome Step */}
           {currentStep === 'welcome' && (
             <div className="text-center">
-              <div className="text-6xl mb-6">🎮</div>
+              <div className="mb-6 flex justify-center">
+                <Gamepad2 className="w-20 h-20 text-minecraft-grass" />
+              </div>
               <h2 className="text-2xl font-bold text-white mb-4">Welcome to McServer!</h2>
               <p className="text-gray-300 mb-6">
                 McServer makes it easy to host and share Minecraft servers with your friends.
@@ -207,19 +209,27 @@ export default function SetupWizard({ onComplete }: WizardProps) {
               </p>
               <div className="grid grid-cols-2 gap-4 text-left mb-6">
                 <div className="bg-gray-700/50 rounded-lg p-4">
-                  <div className="text-minecraft-grass font-bold mb-2">🔄 World Sync</div>
+                  <div className="text-minecraft-grass font-bold mb-2 flex items-center gap-2">
+                    <RefreshCw className="w-4 h-4" /> World Sync
+                  </div>
                   <p className="text-sm text-gray-400">Share worlds with friends using GitHub</p>
                 </div>
                 <div className="bg-gray-700/50 rounded-lg p-4">
-                  <div className="text-minecraft-grass font-bold mb-2">🌐 No Port Forward</div>
+                  <div className="text-minecraft-grass font-bold mb-2 flex items-center gap-2">
+                    <Globe className="w-4 h-4" /> No Port Forward
+                  </div>
                   <p className="text-sm text-gray-400">Players connect without networking setup</p>
                 </div>
                 <div className="bg-gray-700/50 rounded-lg p-4">
-                  <div className="text-minecraft-grass font-bold mb-2">📦 Mod Support</div>
+                  <div className="text-minecraft-grass font-bold mb-2 flex items-center gap-2">
+                    <Package className="w-4 h-4" /> Mod Support
+                  </div>
                   <p className="text-sm text-gray-400">Fabric and Forge fully supported</p>
                 </div>
                 <div className="bg-gray-700/50 rounded-lg p-4">
-                  <div className="text-minecraft-grass font-bold mb-2">💾 Auto Backups</div>
+                  <div className="text-minecraft-grass font-bold mb-2 flex items-center gap-2">
+                    <Save className="w-4 h-4" /> Auto Backups
+                  </div>
                   <p className="text-sm text-gray-400">Never lose your world progress</p>
                 </div>
               </div>
@@ -387,8 +397,8 @@ export default function SetupWizard({ onComplete }: WizardProps) {
                             : 'border-gray-600 bg-gray-700 hover:border-gray-500'
                         }`}
                       >
-                        <div className="text-2xl mb-1">
-                          {type === 'vanilla' ? '🎮' : type === 'fabric' ? '🧵' : '🔨'}
+                        <div className="flex justify-center mb-1">
+                          {type === 'vanilla' ? <Gamepad2 className="w-6 h-6" /> : type === 'fabric' ? <Scissors className="w-6 h-6" /> : <Hammer className="w-6 h-6" />}
                         </div>
                         <div className="text-white font-bold capitalize">{type}</div>
                         <div className="text-xs text-gray-400">
@@ -433,7 +443,9 @@ export default function SetupWizard({ onComplete }: WizardProps) {
           {/* Complete Step */}
           {currentStep === 'complete' && (
             <div className="text-center">
-              <div className="text-6xl mb-6">🎉</div>
+              <div className="mb-6 flex justify-center">
+                <PartyPopper className="w-20 h-20 text-minecraft-grass" />
+              </div>
               <h2 className="text-2xl font-bold text-white mb-4">You're All Set!</h2>
               <p className="text-gray-300 mb-6">
                 McServer is configured and ready to go. Click finish to open the dashboard.

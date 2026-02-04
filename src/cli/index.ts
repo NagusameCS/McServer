@@ -39,7 +39,7 @@ program
   .command('init')
   .description('Initialize McServer in the current directory')
   .action(async () => {
-    console.log(chalk.cyan('\n🎮 Welcome to McServer!\n'));
+    console.log(chalk.cyan('\n[McServer] Welcome to McServer!\n'));
 
     const spinner = ora('Initializing...').start();
 
@@ -164,7 +164,7 @@ profileCmd
         return;
       }
 
-      console.log(chalk.cyan('\n📋 Server Profiles:\n'));
+      console.log(chalk.cyan('\n=== Server Profiles ===\n'));
       
       for (const profile of profiles) {
         const active = profile.id === configManager.activeProfileId ? chalk.green(' (active)') : '';
@@ -250,7 +250,7 @@ program
         }
       }
 
-      console.log(chalk.cyan(`\n🎮 Starting ${profile.name}...\n`));
+      console.log(chalk.cyan(`\n[McServer] Starting ${profile.name}...\n`));
 
       const spinner = ora('Acquiring lock and syncing world...').start();
 
@@ -264,9 +264,9 @@ program
         const tunnelManager = new TunnelManager(configManager.tunnel!);
         const address = await tunnelManager.connect(profile.settings.port);
         spinner.succeed(`Tunnel connected: ${chalk.green(address)}`);
-        console.log(chalk.cyan(`\n📡 Players can connect using: ${chalk.bold(address)}\n`));
+        console.log(chalk.cyan(`\n[Connect] Players can connect using: ${chalk.bold(address)}\n`));
       } else {
-        console.log(chalk.cyan(`\n📡 Server running on port ${profile.settings.port}\n`));
+        console.log(chalk.cyan(`\n[Connect] Server running on port ${profile.settings.port}\n`));
       }
 
       // Handle shutdown
@@ -329,7 +329,7 @@ program
 
       const state = await serverManager.getDashboardState();
 
-      console.log(chalk.cyan('\n📊 Server Status\n'));
+      console.log(chalk.cyan('\n=== Server Status ===\n'));
 
       // Server status
       const statusColor = state.server.status === 'running' ? chalk.green : 
@@ -345,12 +345,12 @@ program
       }
 
       // Sync status
-      console.log(chalk.cyan('\n🔄 Sync Status\n'));
+      console.log(chalk.cyan('\n=== Sync Status ===\n'));
       console.log(`  Lock: ${state.lock.locked ? chalk.red(`Locked by ${state.lock.lockedBy}`) : chalk.green('Available')}`);
       console.log(`  Last sync: ${state.sync.lastSyncTime ? state.sync.lastSyncTime.toISOString() : 'Never'}`);
 
       // System info
-      console.log(chalk.cyan('\n💻 System Info\n'));
+      console.log(chalk.cyan('\n=== System Info ===\n'));
       console.log(`  Platform: ${state.systemInfo.platform} ${state.systemInfo.arch}`);
       console.log(`  Java: ${state.systemInfo.javaVersion || 'Not found'}`);
       console.log(`  Memory: ${formatBytes(state.systemInfo.memoryUsage.used)} / ${formatBytes(state.systemInfo.memoryUsage.total)}`);
@@ -461,7 +461,7 @@ configCmd
     try {
       await configManager.initialize();
 
-      console.log(chalk.cyan('\n⚙️ Configuration\n'));
+      console.log(chalk.cyan('\n=== Configuration ===\n'));
       console.log(`  Data directory: ${configManager.dataDir}`);
       console.log(`  Web port: ${configManager.webPort}`);
       console.log(`  GitHub: ${configManager.isGitHubConfigured() ? chalk.green('Configured') : chalk.yellow('Not configured')}`);
@@ -494,7 +494,7 @@ program
       await webServer.start();
       spinner.succeed('Web dashboard started');
 
-      console.log(chalk.cyan(`\n🌐 Dashboard: http://localhost:${port}`));
+      console.log(chalk.cyan(`\n[Dashboard] http://localhost:${port}`));
       console.log(chalk.gray('\nPress Ctrl+C to stop\n'));
 
       process.on('SIGINT', async () => {
@@ -606,7 +606,7 @@ program
       }
 
       // Step 3: GitHub Configuration
-      console.log(chalk.cyan('\n📦 Step 1: World Sync Configuration\n'));
+      console.log(chalk.cyan('\n=== Step 1: World Sync Configuration ===\n'));
       console.log(chalk.gray('  McServer uses GitHub to sync your worlds across computers.'));
       console.log(chalk.gray('  You\'ll need a GitHub account and a private repository.\n'));
 
@@ -661,7 +661,7 @@ program
       }
 
       // Step 4: Create First Profile
-      console.log(chalk.cyan('\n🎮 Step 2: Create Your First Server\n'));
+      console.log(chalk.cyan('\n=== Step 2: Create Your First Server ===\n'));
 
       const { createProfile } = await inquirer.prompt([{
         type: 'confirm',
@@ -721,7 +721,7 @@ program
       // Step 5: Complete
       console.log(chalk.green(`
 ╔══════════════════════════════════════════════════════════════╗
-║                    Setup Complete! 🎉                        ║
+║                    Setup Complete!                         ║
 ╚══════════════════════════════════════════════════════════════╝
 `));
 

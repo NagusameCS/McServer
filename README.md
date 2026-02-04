@@ -4,25 +4,25 @@
 
 McServer allows a group of friends to host and share a single persistent Minecraft Java Edition world. Any user can locally host the server, and players anywhere in the world can connect without port forwarding.
 
-## ✨ Features
+## Features
 
-- 🎮 **Multi-loader support**: Vanilla, Forge, and Fabric servers
-- 🔄 **World synchronization**: Uses GitHub as turn-based persistent storage
-- 🔒 **Lock mechanism**: Ensures only one host is active at any time
-- 🌐 **NAT traversal**: Players can connect without port forwarding (via playit.gg, ngrok, or Cloudflare)
-- 📦 **Mod management**: Integrated mod support with compatibility checking
-- 💾 **Automatic backups**: Versioned world backups with easy recovery
-- 🖥️ **Web dashboard**: Real-time server status, player list, and controls
-- ⌨️ **CLI interface**: Full command-line control
+- **Multi-loader support**: Vanilla, Forge, and Fabric servers
+- **World synchronization**: Uses GitHub as turn-based persistent storage
+- **Lock mechanism**: Ensures only one host is active at any time
+- **NAT traversal**: Players can connect without port forwarding (via playit.gg, ngrok, or Cloudflare)
+- **Mod management**: Integrated mod support with compatibility checking
+- **Automatic backups**: Versioned world backups with easy recovery
+- **Web dashboard**: Real-time server status, player list, and controls
+- **CLI interface**: Full command-line control
 
-## 🚀 Easy Start (Click and Run!)
+## Easy Start (Click and Run!)
 
 ### Option 1: One-Click Launcher (Recommended for Beginners)
 
 Just double-click and the launcher will:
-- ✅ Check for required software (Node.js, Git, Java)
-- ✅ Offer to install anything missing
-- ✅ Guide you through setup with a friendly wizard
+- Check for required software (Node.js, Git, Java)
+- Offer to install anything missing
+- Guide you through setup with a friendly wizard
 
 **Windows:** Double-click `start.bat`
 
@@ -69,7 +69,7 @@ npm run build
 node dist/cli/index.js wizard
 ```
 
-## 📖 Usage
+## Usage
 
 ### Start the Web Dashboard
 ```bash
@@ -93,9 +93,9 @@ mcserver sync push         # Push world to GitHub
 mcserver sync pull         # Pull world from GitHub
 ```
 
-That's it! 🎉 Share the connection address with your friends.
+That's it! Share the connection address with your friends.
 
-## 📖 Usage
+## Usage
 
 ### CLI Commands
 
@@ -171,7 +171,7 @@ Compatibility checks:
 - Duplicate mod detection
 - Missing dependency warnings
 
-## 🔧 Configuration
+## Configuration
 
 ### GitHub Sync
 
@@ -216,7 +216,7 @@ mcserver backup list
 mcserver backup restore <backupId>
 ```
 
-## 🏗️ Architecture
+## Architecture
 
 ```
 McServer/
@@ -233,13 +233,13 @@ McServer/
 └── logs/                    # Application logs
 ```
 
-## 🔐 Security
+## Security
 
 - GitHub tokens are encrypted using AES-256-GCM with a machine-specific key
 - Web dashboard supports authentication with JWT tokens
 - Role-based access control (owner, admin, member)
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### "Lock is held by another user"
 
@@ -265,7 +265,7 @@ Install Java 17 or newer and ensure it's in your PATH.
 - Check for duplicate mods
 - Install missing dependencies
 
-## 🛠️ Development
+## Development
 
 ### Building from source
 
@@ -301,14 +301,14 @@ src/
 └── constants.ts      # Application constants
 ```
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Please read the contributing guidelines first.
 
-## 📄 License
+## License
 
 MIT License - see [LICENSE](LICENSE) for details.
 
 ---
 
-Made with ❤️ for Minecraft communities everywhere
+Made with love for Minecraft communities everywhere

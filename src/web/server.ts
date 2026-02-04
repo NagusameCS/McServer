@@ -139,7 +139,7 @@ export class WebServer {
             </style>
           </head>
           <body>
-            <h1>🎮 McServer</h1>
+            <h1>McServer</h1>
             <div class="status">
               <p>Dashboard is running. API available at <code>/api</code></p>
               <p>To build the full dashboard, run: <code>cd dashboard && npm install && npm run build</code></p>
