@@ -107,6 +107,10 @@
     "appId": "com.nagusamecs.mcserver",
     "productName": "McServer",
     "copyright": "Copyright (c) 2026 NagusameCS",
+    "asar": true,
+    "asarUnpack": [
+      "node_modules/bcrypt/**/*"
+    ],
     "directories": {
       "output": "release",
       "buildResources": "build"
@@ -116,7 +120,10 @@
       "dashboard/dist/**/*",
       "electron/**/*",
       "assets/**/*",
-      "package.json"
+      "node_modules/**/*",
+      "package.json",
+      "!node_modules/*/{CHANGELOG.md,README.md,readme.md,test,__tests__,tests,*.ts}",
+      "!node_modules/.cache/**/*"
     ],
     "extraResources": [
       {
