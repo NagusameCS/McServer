@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>McServer - Shared Minecraft Server Hosting</title>
+  <meta name="description" content="Cross-platform Minecraft server hosting with world sync and NAT traversal. Host with friends without port forwarding.">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎮</text></svg>">
+  <style>
+    :root {
+      --mc-green: #5D8C3E;
+      --mc-brown: #8B6914;
+      --mc-dark: #1a1a2e;
+      --mc-darker: #0f0f1a;
+      --mc-text: #e8e8e8;
+      --mc-accent: #7CFC00;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      background: var(--mc-darker);
+      color: var(--mc-text);
+      line-height: 1.6;
+    }
+    
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem;
+      background: linear-gradient(135deg, var(--mc-darker) 0%, var(--mc-dark) 100%);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%235D8C3E' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      opacity: 0.5;
+    }
+    
+    .logo {
+      width: 120px;
+      height: 120px;
+      background: linear-gradient(135deg, var(--mc-green) 0%, #4a7c31 100%);
+      border-radius: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 2rem;
+      box-shadow: 0 20px 60px rgba(93, 140, 62, 0.3);
+      position: relative;
+      z-index: 1;
+    }
+    
+    .logo svg {
+      width: 70px;
+      height: 70px;
+      fill: white;
+    }
+    
+    h1 {
+      font-size: 4rem;
+      font-weight: 800;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, var(--mc-text) 0%, var(--mc-accent) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      position: relative;
+      z-index: 1;
+    }
+    
+    .tagline {
+      font-size: 1.5rem;
+      color: #a0a0a0;
+      max-width: 600px;
+      margin-bottom: 3rem;
+      position: relative;
+      z-index: 1;
+    }
+    
+    .buttons {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      position: relative;
+      z-index: 1;
+    }
+    
+    .btn {
+      padding: 1rem 2rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border-radius: 12px;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, var(--mc-green) 0%, #4a7c31 100%);
+      color: white;
+      border: none;
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 30px rgba(93, 140, 62, 0.4);
+    }
+    
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+    
+    .features {
+      padding: 6rem 2rem;
+      background: var(--mc-dark);
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    .section-title {
+      text-align: center;
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+    
+    .section-subtitle {
+      text-align: center;
+      color: #888;
+      margin-bottom: 4rem;
+      font-size: 1.2rem;
+    }
+    
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+    }
+    
+    .feature-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 2rem;
+      transition: all 0.3s ease;
+    }
+    
+    .feature-card:hover {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(93, 140, 62, 0.3);
+      transform: translateY(-5px);
+    }
+    
+    .feature-icon {
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(135deg, var(--mc-green) 0%, #4a7c31 100%);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.5rem;
+      font-size: 1.5rem;
+    }
+    
+    .feature-card h3 {
+      font-size: 1.3rem;
+      margin-bottom: 0.75rem;
+    }
+    
+    .feature-card p {
+      color: #888;
+      font-size: 0.95rem;
+    }
+    
+    .how-it-works {
+      padding: 6rem 2rem;
+      background: var(--mc-darker);
+    }
+    
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 2rem;
+      margin-top: 3rem;
+    }
+    
+    .step {
+      text-align: center;
+      padding: 2rem;
+    }
+    
+    .step-number {
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, var(--mc-green) 0%, #4a7c31 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin: 0 auto 1.5rem;
+    }
+    
+    .step h3 {
+      margin-bottom: 0.75rem;
+    }
+    
+    .step p {
+      color: #888;
+      font-size: 0.95rem;
+    }
+    
+    .code-section {
+      padding: 6rem 2rem;
+      background: var(--mc-dark);
+    }
+    
+    .code-block {
+      background: var(--mc-darker);
+      border-radius: 12px;
+      padding: 2rem;
+      overflow-x: auto;
+      font-family: 'Fira Code', 'Consolas', monospace;
+      font-size: 0.9rem;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .code-block .comment {
+      color: #6a9955;
+    }
+    
+    .code-block .command {
+      color: var(--mc-accent);
+    }
+    
+    .code-block .output {
+      color: #888;
+    }
+    
+    .cta {
+      padding: 6rem 2rem;
+      background: linear-gradient(135deg, var(--mc-green) 0%, #3d6b28 100%);
+      text-align: center;
+    }
+    
+    .cta h2 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+    
+    .cta p {
+      font-size: 1.2rem;
+      opacity: 0.9;
+      margin-bottom: 2rem;
+    }
+    
+    .cta .btn-primary {
+      background: white;
+      color: var(--mc-green);
+    }
+    
+    .cta .btn-primary:hover {
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+    
+    footer {
+      padding: 3rem 2rem;
+      background: var(--mc-darker);
+      text-align: center;
+      color: #666;
+    }
+    
+    footer a {
+      color: var(--mc-accent);
+      text-decoration: none;
+    }
+    
+    footer a:hover {
+      text-decoration: underline;
+    }
+    
+    .compatibility {
+      padding: 4rem 2rem;
+      background: var(--mc-darker);
+    }
+    
+    .compat-grid {
+      display: flex;
+      justify-content: center;
+      gap: 3rem;
+      flex-wrap: wrap;
+      margin-top: 2rem;
+    }
+    
+    .compat-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .compat-icon {
+      width: 60px;
+      height: 60px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+    }
+    
+    .compat-item span {
+      color: #888;
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 2.5rem;
+      }
+      
+      .tagline {
+        font-size: 1.2rem;
+      }
+      
+      .buttons {
+        flex-direction: column;
+      }
+      
+      .btn {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <section class="hero">
+    <div class="logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="2" y="2" width="20" height="8" rx="2" ry="2"/>
+        <rect x="2" y="14" width="20" height="8" rx="2" ry="2"/>
+        <line x1="6" y1="6" x2="6.01" y2="6"/>
+        <line x1="6" y1="18" x2="6.01" y2="18"/>
+      </svg>
+    </div>
+    <h1>McServer</h1>
+    <p class="tagline">Share a Minecraft world with friends. Take turns hosting. No port forwarding required.</p>
+    <div class="buttons">
+      <a href="https://github.com/NagusameCS/McServer/releases" class="btn btn-primary">
+        <span>⬇️</span> Download
+      </a>
+      <a href="https://github.com/NagusameCS/McServer" class="btn btn-secondary">
+        <span>📦</span> View on GitHub
+      </a>
+    </div>
+  </section>
+
+  <section class="features">
+    <div class="container">
+      <h2 class="section-title">Why McServer?</h2>
+      <p class="section-subtitle">Everything you need for seamless multiplayer Minecraft</p>
+      
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="feature-icon">🌍</div>
+          <h3>Shared World Sync</h3>
+          <p>Your world automatically syncs to GitHub. When you stop hosting, a friend can pick up right where you left off.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">🔒</div>
+          <h3>Smart Lock System</h3>
+          <p>Only one person can host at a time. The lock system prevents conflicts and keeps your world safe.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">🌐</div>
+          <h3>No Port Forwarding</h3>
+          <p>Built-in tunneling lets players connect from anywhere. Works behind any router or firewall.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">🔧</div>
+          <h3>Mod Support</h3>
+          <p>Full support for Vanilla, Forge, and Fabric. Mod compatibility checking keeps everyone in sync.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">💾</div>
+          <h3>Automatic Backups</h3>
+          <p>Your world is automatically backed up. Roll back to any previous version with one command.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">🖥️</div>
+          <h3>Web Dashboard</h3>
+          <p>Control your server from a beautiful web interface. See players, manage mods, and monitor status.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="compatibility">
+    <div class="container">
+      <h2 class="section-title">Works Everywhere</h2>
+      <div class="compat-grid">
+        <div class="compat-item">
+          <div class="compat-icon">🪟</div>
+          <span>Windows</span>
+        </div>
+        <div class="compat-item">
+          <div class="compat-icon">🍎</div>
+          <span>macOS</span>
+        </div>
+        <div class="compat-item">
+          <div class="compat-icon">🐧</div>
+          <span>Linux</span>
+        </div>
+        <div class="compat-item">
+          <div class="compat-icon">🟢</div>
+          <span>Vanilla</span>
+        </div>
+        <div class="compat-item">
+          <div class="compat-icon">🔨</div>
+          <span>Forge</span>
+        </div>
+        <div class="compat-item">
+          <div class="compat-icon">🧵</div>
+          <span>Fabric</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="how-it-works">
+    <div class="container">
+      <h2 class="section-title">Get Started in 5 Minutes</h2>
+      <p class="section-subtitle">It's easier than you think</p>
+      
+      <div class="steps">
+        <div class="step">
+          <div class="step-number">1</div>
+          <h3>Download</h3>
+          <p>Download McServer for your platform. Single executable, no installation needed.</p>
+        </div>
+        
+        <div class="step">
+          <div class="step-number">2</div>
+          <h3>Configure</h3>
+          <p>Run the setup wizard to connect your GitHub account and create a server profile.</p>
+        </div>
+        
+        <div class="step">
+          <div class="step-number">3</div>
+          <h3>Share</h3>
+          <p>Share the config with friends. Anyone can host - the world follows the host.</p>
+        </div>
+        
+        <div class="step">
+          <div class="step-number">4</div>
+          <h3>Play</h3>
+          <p>Start hosting and share the connection address. Friends join instantly!</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="code-section">
+    <div class="container">
+      <h2 class="section-title">Simple Commands</h2>
+      <p class="section-subtitle">Powerful CLI for complete control</p>
+      
+      <div class="code-block">
+        <div><span class="comment"># Initialize McServer</span></div>
+        <div><span class="command">$ mcserver init</span></div>
+        <div><span class="output">✓ Configuration initialized</span></div>
+        <br>
+        <div><span class="comment"># Create a Fabric 1.20.4 server</span></div>
+        <div><span class="command">$ mcserver profile create "My Server" --type fabric --version 1.20.4</span></div>
+        <div><span class="output">✓ Profile created: My Server</span></div>
+        <br>
+        <div><span class="comment"># Start hosting</span></div>
+        <div><span class="command">$ mcserver start</span></div>
+        <div><span class="output">✓ Lock acquired</span></div>
+        <div><span class="output">✓ World synced</span></div>
+        <div><span class="output">✓ Tunnel connected: abc123.playit.gg:25565</span></div>
+        <div><span class="output">📡 Players can connect using: abc123.playit.gg:25565</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta">
+    <div class="container">
+      <h2>Ready to Play?</h2>
+      <p>Download McServer and start your adventure with friends today.</p>
+      <a href="https://github.com/NagusameCS/McServer/releases" class="btn btn-primary">
+        <span>⬇️</span> Download Now
+      </a>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <p>
+        Made with ❤️ for Minecraft players everywhere<br>
+        <a href="https://github.com/NagusameCS/McServer">GitHub</a> · 
+        <a href="https://github.com/NagusameCS/McServer/issues">Report Issues</a> · 
+        <a href="https://github.com/NagusameCS/McServer/blob/main/LICENSE">MIT License</a>
+      </p>
+    </div>
+  </footer>
+</body>
+</html>

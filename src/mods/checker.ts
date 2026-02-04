@@ -364,3 +364,6 @@ export class ModCompatibilityChecker {
 
 export const modCompatibilityChecker = new ModCompatibilityChecker();
 export default modCompatibilityChecker;
+
+// Export version checking for testing
+export { satisfiesVersionRange as matchesVersionRange };

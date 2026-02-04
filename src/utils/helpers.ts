@@ -409,3 +409,37 @@ export function deepMerge<T>(target: T, source: Partial<T>): T {
 
   return result;
 }
+
+/**
+ * Sanitize a filename by removing invalid characters
+ */
+export function sanitizeFilename(filename: string): string {
+  return filename.replace(/[<>:"/\\|?*]/g, '');
+}
+
+/**
+ * Check if a string is a valid semver version
+ */
+export function isValidSemver(version: string): boolean {
+  return /^\d+\.\d+\.\d+$/.test(version);
+}
+
+/**
+ * Compare two semver versions
+ * Returns: > 0 if a > b, < 0 if a < b, 0 if equal
+ */
+export function compareVersions(a: string, b: string): number {
+  const partsA = a.split('.').map(Number);
+  const partsB = b.split('.').map(Number);
+  
+  for (let i = 0; i < Math.max(partsA.length, partsB.length); i++) {
+    const numA = partsA[i] || 0;
+    const numB = partsB[i] || 0;
+    
+    if (numA > numB) return 1;
+    if (numA < numB) return -1;
+  }
+  
+  return 0;
+}
+
