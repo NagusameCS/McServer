@@ -2,7 +2,7 @@
   "name": "mcserver",
   "version": "1.0.0-beta.1",
   "description": "Shared Minecraft server hosting with automatic world sync, NAT traversal, and seamless host handoff",
-  "main": "dist/index.js",
+  "main": "electron/main.js",
   "bin": {
     "mcserver": "./dist/cli/index.js"
   },
@@ -11,6 +11,7 @@
     "build:dashboard": "cd dashboard && npm run build",
     "dev": "ts-node src/index.ts",
     "dev:dashboard": "cd dashboard && npm run dev",
+    "dev:electron": "npm run build && electron .",
     "start": "node dist/index.js",
     "cli": "node dist/cli/index.js",
     "test": "vitest run",
@@ -18,7 +19,13 @@
     "test:coverage": "vitest run --coverage",
     "lint": "eslint src --ext .ts",
     "package": "npm run build && pkg . --targets node18-linux-x64,node18-macos-x64,node18-win-x64 --output dist/mcserver",
-    "package:universal": "npm run build && pkg . --targets node18-macos-arm64,node18-macos-x64,node18-win-x64,node18-linux-x64"
+    "package:universal": "npm run build && pkg . --targets node18-macos-arm64,node18-macos-x64,node18-win-x64,node18-linux-x64",
+    "electron:build": "npm run build && electron-builder",
+    "electron:mac": "npm run build && electron-builder --mac --universal",
+    "electron:mac:mas": "npm run build && electron-builder --mac mas --universal",
+    "electron:win": "npm run build && electron-builder --win",
+    "electron:linux": "npm run build && electron-builder --linux",
+    "electron:all": "npm run build && electron-builder --mac --win --linux"
   },
   "pkg": {
     "scripts": "dist/**/*.js",
@@ -66,6 +73,7 @@
     "yazl": "^2.5.1"
   },
   "devDependencies": {
+    "@electron/notarize": "^3.1.1",
     "@types/bcrypt": "^5.0.2",
     "@types/compression": "^1.7.5",
     "@types/cors": "^2.8.17",
@@ -82,11 +90,134 @@
     "@typescript-eslint/eslint-plugin": "^6.13.0",
     "@typescript-eslint/parser": "^6.13.0",
     "@vitest/coverage-v8": "^1.6.1",
+    "electron": "^40.1.0",
+    "electron-builder": "^26.7.0",
     "eslint": "^8.54.0",
     "pkg": "^5.8.1",
     "ts-node": "^10.9.1",
     "typescript": "^5.3.2",
     "vitest": "^1.6.1"
+  },
+  "build": {
+    "appId": "com.nagusamecs.mcserver",
+    "productName": "McServer",
+    "copyright": "Copyright (c) 2026 NagusameCS",
+    "directories": {
+      "output": "release",
+      "buildResources": "build"
+    },
+    "files": [
+      "dist/**/*",
+      "dashboard/dist/**/*",
+      "electron/**/*",
+      "assets/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "dist",
+        "to": "app/dist",
+        "filter": ["**/*"]
+      },
+      {
+        "from": "dashboard/dist",
+        "to": "app/dashboard/dist",
+        "filter": ["**/*"]
+      }
+    ],
+    "mac": {
+      "category": "public.app-category.games",
+      "icon": "build/icon.icns",
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
+      "entitlements": "build/entitlements.mac.plist",
+      "entitlementsInherit": "build/entitlements.mac.plist",
+      "target": [
+        {
+          "target": "dmg",
+          "arch": ["universal"]
+        },
+        {
+          "target": "zip",
+          "arch": ["universal"]
+        }
+      ]
+    },
+    "mas": {
+      "category": "public.app-category.games",
+      "icon": "build/icon.icns",
+      "hardenedRuntime": false,
+      "entitlements": "build/entitlements.mas.plist",
+      "entitlementsInherit": "build/entitlements.mas.inherit.plist",
+      "provisioningProfile": "build/embedded.provisionprofile",
+      "target": [
+        {
+          "target": "mas",
+          "arch": ["universal"]
+        }
+      ]
+    },
+    "dmg": {
+      "contents": [
+        {
+          "x": 130,
+          "y": 220
+        },
+        {
+          "x": 410,
+          "y": 220,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ],
+      "window": {
+        "width": 540,
+        "height": 400
+      }
+    },
+    "win": {
+      "icon": "build/icon.ico",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64", "arm64"]
+        },
+        {
+          "target": "portable",
+          "arch": ["x64"]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "McServer"
+    },
+    "linux": {
+      "icon": "build/icons",
+      "category": "Game",
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": ["x64", "arm64"]
+        },
+        {
+          "target": "deb",
+          "arch": ["x64"]
+        }
+      ],
+      "desktop": {
+        "StartupWMClass": "McServer"
+      }
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "NagusameCS",
+      "repo": "McServer"
+    },
+    "afterSign": "scripts/notarize.js"
   },
   "engines": {
     "node": ">=18.0.0"

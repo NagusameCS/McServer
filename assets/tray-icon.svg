@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <defs>
+    <linearGradient id="grass" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#7EC850"/>
+      <stop offset="100%" style="stop-color:#5D8C3E"/>
+    </linearGradient>
+  </defs>
+  <!-- Simple server icon for system tray -->
+  <rect x="2" y="2" width="28" height="28" rx="4" fill="url(#grass)"/>
+  <rect x="6" y="8" width="20" height="6" rx="1" fill="#fff" opacity="0.9"/>
+  <rect x="6" y="16" width="20" height="6" rx="1" fill="#fff" opacity="0.7"/>
+  <circle cx="9" cy="11" r="1.5" fill="#5D8C3E"/>
+  <circle cx="9" cy="19" r="1.5" fill="#5D8C3E"/>
+</svg>
