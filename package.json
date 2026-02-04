@@ -1,6 +1,6 @@
 {
   "name": "mcserver",
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0-beta.2",
   "description": "Shared Minecraft server hosting with automatic world sync, NAT traversal, and seamless host handoff",
   "main": "electron/main.js",
   "bin": {
