@@ -27,22 +27,15 @@ if (isPackaged) {
   nodeModulesPath = path.join(__dirname, '..', 'node_modules');
 }
 
-// Add node_modules to the module search path
-const originalResolveLookupPaths = Module._resolveLookupPaths;
-Module._resolveLookupPaths = function(request, parent) {
-  const result = originalResolveLookupPaths.call(this, request, parent);
-  if (result && result.length > 0) {
-    // Add our node_modules path to the search paths
-    if (!result.includes(nodeModulesPath)) {
-      result.unshift(nodeModulesPath);
-    }
-  }
-  return result;
-};
+// Set NODE_PATH so Node.js can find modules in the asar
+// This must be set BEFORE requiring any modules
+process.env.NODE_PATH = [
+  nodeModulesPath,
+  process.env.NODE_PATH
+].filter(Boolean).join(path.delimiter);
 
-// Also set NODE_PATH for child processes
-process.env.NODE_PATH = nodeModulesPath;
-require('module').Module._initPaths();
+// Re-initialize module paths with the updated NODE_PATH
+Module._initPaths();
 
 // Set environment variables for the server
 process.env.MCSERVER_BASE_PATH = basePath;
