@@ -182,54 +182,26 @@ if not exist "dist" (
 echo  ✓ Build complete
 
 :: ============================================================================
-:: Ready! Show menu
+:: Launch Dashboard - The wizard is now built into the web UI!
 :: ============================================================================
-:menu
 echo.
 echo  ╔══════════════════════════════════════════════════════════════╗
 echo  ║                    McServer Ready!                           ║
 echo  ╚══════════════════════════════════════════════════════════════╝
 echo.
-echo  What would you like to do?
-echo.
-echo  [1] Start Setup Wizard (first time setup)
-echo  [2] Launch Dashboard (web interface)
-echo  [3] Open CLI (command line)
-echo  [4] Exit
-echo.
-set /p action="Enter choice (1-4): "
-
-if "%action%"=="1" goto wizard
-if "%action%"=="2" goto dashboard
-if "%action%"=="3" goto cli
-if "%action%"=="4" goto end
-
-echo Invalid choice. Please try again.
-goto menu
-
-:wizard
-echo.
-echo  Starting Setup Wizard...
-node dist/cli/index.js wizard
-goto menu
-
-:dashboard
-echo.
-echo  Starting Dashboard...
+echo  Starting McServer Dashboard...
 echo  Opening http://localhost:3847 in your browser...
-start http://localhost:3847
+echo.
+echo  (The setup wizard will appear automatically on first run)
+echo  (Press Ctrl+C to stop the server)
+echo.
+
+:: Open browser after a short delay
+start "" cmd /c "timeout /t 2 /nobreak >nul && start http://localhost:3847"
+
+:: Start the web server
 node dist/cli/index.js serve
-goto menu
 
-:cli
-echo.
-echo  Starting CLI...
-echo  Type 'help' for available commands.
-echo.
-node dist/cli/index.js
-goto menu
-
-:end
 echo.
 echo  Thank you for using McServer!
 echo.

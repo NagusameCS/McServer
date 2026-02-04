@@ -20,17 +20,55 @@ import {
   logout 
 } from './auth';
 import { ApiResponse, ServerProfile, ServerType } from '../types';
-import { createLogger, getLogs } from '../utils';
+import { createLogger, getLogs, getJavaVersion } from '../utils';
 
 const logger = createLogger('API');
 const router = Router();
 
 // ============================================================================
-// Health Check
+// Health Check & Setup Status
 // ============================================================================
 
 router.get('/health', (req: Request, res: Response) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// Check if initial setup has been completed (no auth required)
+router.get('/config/setup-status', (req: Request, res: Response) => {
+  const hasProfiles = configManager.hasProfiles();
+  const setupComplete = (configManager as any).config?.setupComplete === true;
+  res.json({ complete: hasProfiles || setupComplete });
+});
+
+// Mark setup as complete
+router.post('/config/setup-complete', (req: Request, res: Response) => {
+  try {
+    configManager.setSetupComplete(true);
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ success: false, error: 'Failed to save setup status' });
+  }
+});
+
+// Check Java installation (no auth required for setup)
+router.get('/system/java', async (req: Request, res: Response) => {
+  try {
+    const version = await getJavaVersion();
+    res.json({ version });
+  } catch {
+    res.json({ version: null });
+  }
+});
+
+// Save GitHub config (no auth required during setup)
+router.post('/config/github', async (req: Request, res: Response) => {
+  try {
+    const { token, owner, repo, branch, lfsEnabled } = req.body;
+    configManager.setGitHubConfig({ token, owner, repo, branch, lfsEnabled });
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ success: false, error: 'Failed to save GitHub config' });
+  }
 });
 
 // ============================================================================

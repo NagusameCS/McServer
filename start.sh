@@ -183,63 +183,31 @@ if [ ! -d "dist" ]; then
 fi
 echo -e "  ${GREEN}✓${NC} Build complete"
 
-# Menu loop
-show_menu() {
-    echo ""
-    echo -e "${CYAN}╔══════════════════════════════════════════════════════════════╗${NC}"
-    echo -e "${CYAN}║${NC}                    ${GREEN}McServer Ready!${NC}                           ${CYAN}║${NC}"
-    echo -e "${CYAN}╚══════════════════════════════════════════════════════════════╝${NC}"
-    echo ""
-    echo "  What would you like to do?"
-    echo ""
-    echo "  [1] Start Setup Wizard (first time setup)"
-    echo "  [2] Launch Dashboard (web interface)"
-    echo "  [3] Open CLI (command line)"
-    echo "  [4] Exit"
-    echo ""
-    read -p "  Enter choice (1-4): " action
+# Launch Dashboard directly - wizard is built into the web UI!
+echo ""
+echo -e "${CYAN}╔══════════════════════════════════════════════════════════════╗${NC}"
+echo -e "${CYAN}║${NC}                    ${GREEN}McServer Ready!${NC}                           ${CYAN}║${NC}"
+echo -e "${CYAN}╚══════════════════════════════════════════════════════════════╝${NC}"
+echo ""
+echo "  Starting McServer Dashboard..."
+echo "  Opening http://localhost:3847 in your browser..."
+echo ""
+echo "  (The setup wizard will appear automatically on first run)"
+echo "  (Press Ctrl+C to stop the server)"
+echo ""
 
-    case $action in
-        1)
-            echo ""
-            echo "  Starting Setup Wizard..."
-            node dist/cli/index.js wizard
-            show_menu
-            ;;
-        2)
-            echo ""
-            echo "  Starting Dashboard..."
-            echo "  Opening http://localhost:3847 in your browser..."
-            
-            # Open browser
-            if [ "$OS" = "macos" ]; then
-                open http://localhost:3847 &
-            else
-                xdg-open http://localhost:3847 2>/dev/null &
-            fi
-            
-            node dist/cli/index.js serve
-            show_menu
-            ;;
-        3)
-            echo ""
-            echo "  Starting CLI..."
-            echo "  Type 'help' for available commands."
-            echo ""
-            node dist/cli/index.js
-            show_menu
-            ;;
-        4)
-            echo ""
-            echo "  Thank you for using McServer!"
-            echo ""
-            exit 0
-            ;;
-        *)
-            echo "  Invalid choice. Please try again."
-            show_menu
-            ;;
-    esac
-}
+# Open browser after a short delay
+(sleep 2 && {
+    if [ "$OS" = "macos" ]; then
+        open http://localhost:3847
+    else
+        xdg-open http://localhost:3847 2>/dev/null || echo "Open http://localhost:3847 in your browser"
+    fi
+}) &
 
-show_menu
+# Start the web server
+node dist/cli/index.js serve
+
+echo ""
+echo "  Thank you for using McServer!"
+echo ""

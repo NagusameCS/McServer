@@ -290,6 +290,12 @@ class ConfigManager {
     await this.save();
   }
 
+  async setSetupComplete(complete: boolean): Promise<void> {
+    (this.config as any).setupComplete = complete;
+    await this.save();
+    logger.info('Setup complete status updated');
+  }
+
   // ============================================================================
   // Profile Management
   // ============================================================================
