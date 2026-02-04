@@ -39,3 +39,10 @@ pnpm-lock.yaml
 # Binary builds
 bin/
 *.exe
+
+# Electron build outputs
+release/
+*.AppImage
+*.dmg
+*.exe
+*.deb

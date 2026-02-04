@@ -25,6 +25,28 @@ app.on('second-instance', () => {
   }
 });
 
+// Get icon path that works in both dev and packaged app
+function getIconPath(iconName) {
+  const isPackaged = app.isPackaged;
+  const possiblePaths = isPackaged ? [
+    path.join(process.resourcesPath, 'app', 'assets', iconName),
+    path.join(process.resourcesPath, 'assets', iconName),
+    path.join(__dirname, '..', 'assets', iconName),
+  ] : [
+    path.join(__dirname, '..', 'assets', iconName),
+    path.join(__dirname, '..', 'build', 'icons', iconName),
+  ];
+  
+  for (const p of possiblePaths) {
+    try {
+      if (require('fs').existsSync(p)) {
+        return p;
+      }
+    } catch (e) {}
+  }
+  return possiblePaths[0]; // Fallback
+}
+
 // Create the main application window
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -33,7 +55,7 @@ function createWindow() {
     minWidth: 900,
     minHeight: 600,
     title: 'McServer',
-    icon: path.join(__dirname, '../assets/icon.png'),
+    icon: getIconPath('icon.png'),
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
@@ -74,23 +96,15 @@ function createWindow() {
 
 // Create system tray
 function createTray() {
-  // Try multiple icon paths
-  const iconPaths = [
-    path.join(__dirname, '../assets/tray-icon.png'),
-    path.join(__dirname, '../build/icons/icon_32x32.png'),
-    path.join(process.resourcesPath, 'app/assets/tray-icon.png'),
-  ];
-  
+  const iconPath = getIconPath('tray-icon.png');
   let icon = null;
-  for (const iconPath of iconPaths) {
-    try {
-      if (require('fs').existsSync(iconPath)) {
-        icon = nativeImage.createFromPath(iconPath);
-        break;
-      }
-    } catch (e) {
-      // Continue to next path
+  
+  try {
+    if (require('fs').existsSync(iconPath)) {
+      icon = nativeImage.createFromPath(iconPath);
     }
+  } catch (e) {
+    console.log('Could not load tray icon:', e.message);
   }
   
   // Create empty icon if none found
@@ -260,27 +274,40 @@ function waitForServer(maxAttempts = 30) {
 // Start the backend server
 async function startServer() {
   return new Promise((resolve, reject) => {
-    const serverPath = isDev 
-      ? path.join(__dirname, '../dist/index.js')
-      : path.join(process.resourcesPath, 'app/dist/index.js');
+    // Use the dedicated server entry point
+    const serverPath = path.join(__dirname, 'server.js');
     
     console.log('Starting server from:', serverPath);
+    console.log('isDev:', isDev);
+    console.log('resourcesPath:', process.resourcesPath);
     
     serverProcess = fork(serverPath, [], {
       env: {
         ...process.env,
         PORT: PORT.toString(),
-        ELECTRON: 'true'
+        ELECTRON: 'true',
+        NODE_ENV: isDev ? 'development' : 'production'
       },
-      stdio: 'pipe'
+      stdio: ['pipe', 'pipe', 'pipe', 'ipc']
+    });
+    
+    // Listen for ready message from server
+    serverProcess.on('message', (msg) => {
+      if (msg.type === 'ready') {
+        console.log('Server ready on port:', msg.port);
+        resolve();
+      } else if (msg.type === 'error') {
+        console.error('Server error:', msg.message);
+        reject(new Error(msg.message));
+      }
     });
     
     serverProcess.stdout?.on('data', (data) => {
-      console.log('[Server]', data.toString());
+      console.log('[Server]', data.toString().trim());
     });
     
     serverProcess.stderr?.on('data', (data) => {
-      console.error('[Server Error]', data.toString());
+      console.error('[Server Error]', data.toString().trim());
     });
     
     serverProcess.on('error', (err) => {
@@ -290,18 +317,20 @@ async function startServer() {
     
     serverProcess.on('exit', (code) => {
       console.log('Server exited with code:', code);
-      if (!isQuitting) {
+      if (!isQuitting && code !== 0) {
         // Server crashed, show error
         dialog.showErrorBox('Server Error', 'The McServer backend has stopped unexpectedly.');
       }
     });
     
-    // Wait for server to be ready
+    // Fallback: wait for HTTP server if IPC message doesn't arrive
     setTimeout(() => {
-      waitForServer()
-        .then(resolve)
-        .catch(reject);
-    }, 1000);
+      if (serverProcess && !serverProcess.killed) {
+        waitForServer()
+          .then(resolve)
+          .catch(reject);
+      }
+    }, 2000);
   });
 }
 
