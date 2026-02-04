@@ -479,6 +479,7 @@ configCmd
 
 program
   .command('dashboard')
+  .alias('serve')
   .description('Start the web dashboard')
   .option('-p, --port <port>', 'Port to run on', '3847')
   .action(async (options) => {

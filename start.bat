@@ -199,8 +199,8 @@ echo.
 :: Open browser after a short delay
 start "" cmd /c "timeout /t 2 /nobreak >nul && start http://localhost:3847"
 
-:: Start the web server
-node dist/cli/index.js serve
+:: Start the web server (dashboard command)
+node dist/cli/index.js dashboard
 
 echo.
 echo  Thank you for using McServer!

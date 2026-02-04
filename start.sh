@@ -205,8 +205,8 @@ echo ""
     fi
 }) &
 
-# Start the web server
-node dist/cli/index.js serve
+# Start the web server (dashboard command)
+node dist/cli/index.js dashboard
 
 echo ""
 echo "  Thank you for using McServer!"
